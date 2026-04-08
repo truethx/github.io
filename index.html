@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Простить измену или уйти?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --step-0: clamp(1.0625rem, 0.98rem + 0.4vw, 1.1875rem);
+  --step-2: clamp(1.5rem, 1.18rem + 1.57vw, 2.25rem);
+  --accent: #FF6B00;
+  --accent-light: rgba(255, 107, 0, 0.12);
+  --accent-border: rgba(255, 107, 0, 0.3);
+  --accent-med: rgba(255, 107, 0, 0.15);
+  --green: #1a9e5c;
+  --ink: #2A2A2A;
+  --ink-2: #3D3D3D;
+  --ink-3: #717171;
+  --bg: #ffffff;
+  --surface: #f5f5f0;
+  --surface-2: #efefea;
+  --line: #e2e2dd;
+}
+* { box-sizing: border-box; margin: 0; }
+html { scroll-behavior: smooth; }
+
+/* ── Прогресс-бар ── */
+#reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: var(--accent);
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  font-size: var(--step-0);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--ink-2);
+  background: var(--bg);
+  padding: 0 clamp(18px, 4vw, 24px);
+  -webkit-font-smoothing: antialiased;
+}
+.container {
+  max-width: 65ch;
+  margin: 0 auto;
+  padding-top: clamp(44px, 5vw, 64px);
+  padding-bottom: 80px;
+}
+
+/* ── Базовые элементы ── */
+p { margin-bottom: 0.9em; line-height: 1.65; }
+b, strong { font-weight: 700; color: var(--ink); }
+
+/* ── Кикер ── */
+.kicker {
+  display: inline-block;
+  font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.13em; text-transform: uppercase;
+  background: var(--accent); color: #fff;
+  padding: 5px 13px; margin-bottom: 16px; border-radius: 2px;
+}
+
+/* ── H1 ── */
+h1 {
+  font-size: var(--step-2);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+
+/* ── Заголовки секций ── */
+.section-heading {
+  font-size: clamp(1.25rem, 2vw + 0.5rem, 1.65rem);
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-top: 2.6em;
+  margin-bottom: 0.9em;
+}
+
+/* ── Лид ── */
+.sublead {
+  font-size: var(--step-0);
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--ink-2);
+  margin-bottom: 2em;
+}
+
+/* ── Сильная фраза ── */
+.solo {
+  font-size: 1.15em;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.4;
+  margin: 1.6em 0;
+}
+
+/* ── Pull-quote ── */
+.pullquote {
+  font-size: 1.15em; font-weight: 800;
+  color: var(--ink); line-height: 1.35;
+  border-left: 4px solid var(--accent);
+  padding: 4px 0 4px 18px;
+  margin: 1.8em 0;
+}
+
+/* ── Маркерное выделение ── */
+.mark {
+  background: var(--accent-light);
+  border-bottom: 2px solid var(--accent);
+  padding: 1px 3px;
+  border-radius: 2px;
+  color: inherit;
+  font-weight: 700;
+}
+
+mark {
+  background: var(--accent-med);
+  padding: 2px 5px;
+  border-radius: 2px;
+  color: inherit;
+}
+
+/* ── Отступы ── */
+.spacer { margin-top: 2em; }
+.spacer-sm { margin-top: 1.2em; }
+.divider { margin: 2.4em 0; height: 1px; background: var(--line); }
+
+/* ── Цитата клиента ── */
+.quote-block {
+  margin: 1.8em 0;
+  padding: 18px 22px;
+  background: var(--surface);
+  border-left: 3px solid var(--line);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ink-2);
+  line-height: 1.7;
+}
+
+/* ── Ответный диалог ── */
+.dialog-block {
+  margin: 1.4em 0;
+  padding: 16px 22px;
+  background: var(--surface);
+  border-left: 3px solid var(--accent);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ink-2);
+  line-height: 1.7;
+}
+
+/* ── Шаги ── */
+.steps {
+  position: relative;
+  margin: 2em 0;
+  padding-left: 44px;
+}
+.steps::before {
+  content: '';
+  position: absolute;
+  left: 13px; top: 10px; bottom: 10px;
+  width: 1.5px;
+  background: var(--ink);
+  opacity: 0.12;
+}
+.step { position: relative; margin-bottom: 2em; }
+.step:last-child { margin-bottom: 0; }
+.step-num {
+  position: absolute;
+  left: -44px; top: 2px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 800; color: #fff; z-index: 1;
+}
+.step-title { font-weight: 800; color: var(--ink); display: block; margin-bottom: 8px; font-size: 1.02em; }
+.step-result {
+  margin-top: 12px; padding: 12px 16px;
+  background: var(--surface);
+  border-left: 3px solid var(--accent);
+  font-size: 0.93em; line-height: 1.65; color: var(--ink-2);
+}
+
+/* ── Цена ── */
+.price-block {
+  text-align: center;
+  margin: 2.4em 0; padding: 28px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.price-old { font-size: 0.95em; color: #bbb; text-decoration: line-through; margin-bottom: 4px; }
+.price-main {
+  font-size: clamp(3.2rem, 9vw, 5.5rem);
+  font-weight: 800; letter-spacing: -0.04em;
+  color: var(--ink); line-height: 1; margin-bottom: 6px;
+}
+.price-sub { font-size: 0.8em; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.12em; }
+
+/* ── Гарантия ── */
+.guarantee-block {
+  margin: 1.6em 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.guarantee-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.guarantee-head-title { font-weight: 800; font-size: 1.03em; color: var(--ink); }
+.guarantee-body { padding: 16px 18px; }
+.guarantee-body p { margin-bottom: 0.7em; font-size: 0.96em; line-height: 1.65; }
+.guarantee-body p:last-child { margin-bottom: 0; }
+.guarantee-body .g-note {
+  margin-top: 12px; padding: 12px 14px;
+  background: var(--accent-light);
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  font-size: 0.9em; line-height: 1.6;
+}
+
+/* ── Блок "не для всех" ── */
+.warning-head {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 0.8em;
+}
+.warning-icon {
+  flex-shrink: 0; width: 28px; height: 28px;
+  border-radius: 50%; background: #d93025;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+}
+
+/* ── CTA ── */
+.cta-wrap { text-align: center; margin: 2.8em 0; }
+.cta-btn {
+  display: inline-block;
+  background: var(--accent); color: #fff;
+  font-family: inherit; font-size: var(--step-0);
+  font-weight: 700; letter-spacing: 0.05em;
+  text-transform: uppercase; text-decoration: none;
+  padding: 16px 56px; border-radius: 6px;
+  border: none; cursor: pointer;
+  transition: filter 0.15s, transform 0.15s;
+}
+.cta-btn:hover { filter: brightness(0.92); transform: translateY(-1px); }
+.cta-hint { font-size: 0.85em; font-weight: 300; color: var(--ink-3); margin-top: 12px; line-height: 1.5; }
+
+/* ── Disclaimer ── */
+.disclaimer {
+  margin-top: 3em;
+  padding: 20px 0 0;
+  border-top: 1px solid var(--line);
+}
+.disclaimer p {
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: var(--ink-3);
+  margin-bottom: 0.6em;
+}
+.disclaimer p:last-child { margin-bottom: 0; }
+
+@media (max-width: 480px) {
+  .container { padding-top: 44px; padding-bottom: 60px; }
+  .cta-btn { display: block; width: 100%; padding: 16px 24px; }
+  .steps { padding-left: 36px; }
+  .step-num { left: -36px; width: 24px; height: 24px; font-size: 0.65rem; }
+  .steps::before { left: 11px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ПРОГРЕСС-БАР -->
+<div id="reading-progress"></div>
+
+<div class="container">
+
+<!-- HERO -->
+<div class="kicker">Гипнотерапия · работа с подсознанием</div>
+<h1>"Простить измену или уйти?" – вопрос, который сводит с ума.</h1>
+
+<p class="sublead">Как выключить ад внутри, если измена мужа разрезала жизнь пополам, а мозг 24/7 крутит одни и те же картинки предательства?</p>
+<p class="sublead">За 2 часа эта боль перестанет душить тебя изнутри, и ты наконец поймёшь, чего хочешь на самом деле. Даже если сейчас кажется, что земля уходит из-под ног.</p>
+
+<div class="divider"></div>
+
+<!-- ИСТОРИЯ -->
+<p>"Я просто хочу выключить голову, чтобы не сойти с ума".</p>
+<p>Это история моей клиентки, чью боль пытались заболтать.</p>
+<p>Внешне она выглядела собранной. Но за годы практики я научился считывать это за секунду: напряжённые плечи, поверхностное дыхание.</p>
+<p>Будто внутри застрял осколок, и каждый вдох причиняет физическую боль.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Назовём её Анной. Несколько месяцев назад она узнала об измене мужа.</p>
+<p>Привычная жизнь и базовое доверие накрылись медным тазом в один день. Анна зависла в самом мучительном состоянии: решиться уйти не могла, а простить не получалось.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Она натягивала 🎭 (маску нормальности)</p>
+<p>Днём – работа, быт, дети. Со стороны казалось, что она справляется.</p>
+<p>Но внутри каждую секунду фоном крутилась эта чёртова плёнка.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Настоящий ад начинался, стоило ей остаться одной – в машине, в душе или когда дети засыпали.</p>
+<p>В этой тишине картинки измены становились невыносимо яркими.</p>
+<p>Навязчивая мысленная 🍬 (жвачка) и вопросы "Как он мог?" выматывали сильнее любой физической работы.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Сначала она думала: время лечит. Нужно просто перетерпеть этот шторм.</p>
+<p>Но становилось только хуже.</p>
+
+<div class="pullquote">Время не лечит измену. Оно просто прячет боль поглубже – до следующего триггера.</div>
+
+<p>Сон исчез – она просыпалась как 🧟‍♀️ (зомбак)</p>
+<p>Появился удушающий спазм в груди. Из-за непрекращающегося напряжения она срывалась на близких и буквально ехала крышей.</p>
+<p>Вся энергия уходила на то, чтобы просто дожить до вечера.</p>
+
+<div class="spacer-sm"></div>
+
+<p><b>Критическая точка:</b> обычный вторник, пробка.</p>
+<p>Мозг снова подкинул деталь ИХ переписки. Паническая атака, нехватка воздуха, слёзы.</p>
+<p>В тот момент она поняла: "Меня больше нет. Если я это не остановлю, мне просто ⚰️ (крышка)".</p>
+
+<div class="divider"></div>
+
+<p>Она пошла "правильным" путём – к классическому психологу.</p>
+<p>Что они делали? Разговаривали.</p>
+<p>Она спустила на беседы кругленькую сумму, но толку ноль.</p>
+<p>Убирать эту боль разговорами – как удалять вирус из системы, протирая 🖥🧽(монитор влажной тряпочкой) Вроде чисто, а внутри всё по-прежнему глючит.</p>
+
+<div class="spacer-sm"></div>
+
+<div class="pullquote">Разговоры о боли и работа с болью – разные вещи.</div>
+
+<p><u>Пока не залезешь в <span class="mark">исходный код подсознания</span>, эта программа будет фоном сжирать твою жизнь.</u></p>
+<p><i>Но об этом она узнала позже.</i></p>
+
+<div class="divider"></div>
+
+<p>Мой пост про гипнотерапию попался ей в ленте.</p>
+<p>Там объяснялось: мозг застревает из-за старой программы, записанной ещё до измены. Впервые ей объяснили не "как пережить", а <mark>"почему не отпускает"</mark>.</p>
+<p>Записалась без веры – просто остальное не работало.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Анна пришла со скепсисом:</p>
+
+<div class="quote-block">"Слушай, я уже всё понимаю головой. Последние недели я не живу, а только и делаю, что лихорадочно перерываю интернет в поисках ответов. Я посмотрела десятки видео на ютуб, я знаю по пунктам все стадии горя и почему мужчины изменяют. Психолог мне всё разложил по полочкам... Но мне всё равно больно так, будто это случилось пять минут назад. Каждую секунду хочется выть. Похоже, я просто безнадёжна, а твой гипноз – очередная 🍝 (лапша на уши...)"</div>
+
+<p>В этом её главная ошибка, как и у 90% женщин.</p>
+<p>Они думают, что <mark>недостаточно поняли.</mark> На самом деле – <mark>слишком долго объясняли.</mark></p>
+
+<div class="spacer-sm"></div>
+
+<p>Я ответил:</p>
+
+<div class="dialog-block">"Я не буду просто логически обсуждать твою ситуацию. Твоя логика всё понимает, но она здесь бессильна. Твоя боль – это сработавшая система выживания, нервная система бьёт тревогу. Пока мы не вырубим эту 🚨 (пожарную сирену) напрямую в подсознании, ты будешь мучиться."</div>
+
+<div class="spacer-sm"></div>
+
+<p>Мы сделали то, чего она не ожидала: вообще не обсуждали детали измены.</p>
+<p>Вошли в трансовое состояние и нашли момент, где всё застряло. Подсознание перезаписало реакцию – и <span class="mark">эмоциональный заряд исчез</span>.</p>
+
+<div class="spacer-sm"></div>
+
+<p>В конце сессии она впервые за эти бесконечные недели сделала глубокий вдох без боли.</p>
+<p>Ясен 🪵 (пень) – она была в шоке, как быстро отпустило.</p>
+
+<div class="spacer-sm"></div>
+
+<p><b>Именно этот метод я предлагаю тебе сегодня.</b></p>
+<p>Если в этой истории ты узнала себя – внимательно изучи то, что написано ниже.</p>
+
+<div class="divider"></div>
+
+<!-- МЕТОД -->
+<h2 class="section-heading">В чём секрет метода и почему тебя отпустит за одну встречу?</h2>
+
+<p>Твой мозг – это сложнейший биокомпьютер.</p>
+<p>Когда случилась измена, она просто активировала спящий вирус. Сама программа страданий и глубинных обид часто прописывается ещё в далёком прошлом.</p>
+<p>Мы найдём это самое первое событие, из-за которого измена бьёт по тебе так сильно, и отключим его влияние на твоё текущее состояние.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Обычные психологи годами пытаются заболтать этот вирус через логику и проговаривание чувств.</p>
+<p>Но это 🤡 (цирк) Потому что логика – это всего <span class="mark">5% твоего разума.</span></p>
+<p><u>Подсознание плевать хотело на слова, оно не понимает лекций и аргументов.</u> Оно реагирует только на образы и ощущения.</p>
+
+<div class="pullquote">Именно поэтому ты всё понимаешь головой, а боль в теле не проходит.</div>
+
+<div class="spacer-sm"></div>
+
+<p>Система классической психотерапии устроена так, чтобы ты продолжала платить.</p>
+<p>Им просто невыгодно лечить быстро – здоровый клиент для них означает убыток. А если болтовня не помогает, тебе назначат таблетку. Но она лишь давит симптом, не убирая причину.</p>
+<p>Источник болезни остаётся внутри и со временем начинает разрушать твоё тело уже физически. 🤷 (ничего личного, просто бизнес)</p>
+
+<div class="spacer-sm"></div>
+
+<p>Я работаю иначе.</p>
+<p>Самый талантливый лекарь на этой планете – это твоё собственное подсознание, но доступ к нему сейчас заблокирован шоком.</p>
+<p>Я выступаю как проводник: мы вместе убираем эмоциональный мусор и программы, которые мешают восстановлению, чтобы запустить естественный процесс самоисцеления.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Объяснять разницу – всё равно что описывать слепому 🌈 (радугу)</p>
+<p>Пока ты на себе не почувствуешь, как прямо на сессии тебе становится легче – ты не поймёшь, как это работает.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Именно поэтому 20 сессий 🗣 (бла-бла-терапии) не стоят и часа прямой работы с твоим подсознанием.</p>
+<p><b>Одна сессия заменяет месяцы походов по психологам не потому, что я быстрее говорю. А потому, что я работаю там, куда их разговоры не добираются.</b></p>
+
+<div class="divider"></div>
+
+<!-- КТО Я -->
+<h2 class="section-heading">Кто я такой и почему я так уверен в своём методе?</h2>
+
+<p>Я не психолог-теоретик, который 5 лет зубрил устаревшие учебники, чтобы получить картонный диплом и научиться участливо кивать головой.</p>
+
+<div class="spacer-sm"></div>
+
+<p>В 21 год я потерял всё: отношения, которые казались смыслом жизни, друзей, миллион долларов...</p>
+<p>Я знаю, как это, когда тебя размазывает по дну так, что ты не можешь сделать вдох. И я понял: долгие разговоры в этот момент не работают. Это просто иллюзия терапии.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Я не хотел годами решать свои проблемы. Мне нужно было решение здесь и сейчас.</p>
+<p>И когда я нашёл метод прямой работы с подсознанием – меня отпустило за считанные часы.</p>
+<p>Это настолько перевернуло мою жизнь, что я решил: я хочу помогать другим.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Я вложил более 10 000$ в обучение у топовых практиков, прошёл более 200 часов личных проработок и огромный объём практики.</p>
+<p>Я оттачивал инструменты, которые дают результат сразу, а не через годы бесед.</p>
+
+<div class="spacer-sm"></div>
+
+<p>То, что спасло меня, теперь работает для моих клиенток.</p>
+<p>Я не предлагаю тебе долгие беседы о чувствах. Я предлагаю конкретное решение: <b>найти причину твоей боли и просто её выключить.</b></p>
+
+<div class="divider"></div>
+
+<!-- РЕЗУЛЬТАТ -->
+<h2 class="section-heading">Какой будет результат?</h2>
+
+<p>Прямо на сессии ты полностью снимешь острую, выматывающую душевную боль и остановишь поток навязчивых мыслей об измене.</p>
+<p>Даже если сейчас кажется, что это состояние никогда не закончится – мы снизим его влияние в подсознании.</p>
+<p>Мы сработаем как 🔪 хирурги сознания: пойдём напрямую в подсознание, чтобы извлечь этот вирус и остановить твоё эмоциональное истощение.</p>
+
+<div class="steps">
+  <div class="step">
+    <div class="step-num">1</div>
+    <p>
+      <span class="step-title">Поиск истинного источника</span>
+      Мы найдём ту самую глубокую внутреннюю уязвимость, из-за которой измена ударила по тебе так невыносимо больно.
+    </p>
+    <div class="step-result"><b>Результат:</b> Ты ясно увидишь, какая именно старая рана кровоточит через эту ситуацию. Ты осознаешь, что ни в чём не виновата, и сбросишь огромный груз самобичевания.</div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <p>
+      <span class="step-title">Отключение острой боли</span>
+      Мы проработаем причину напрямую в подсознании – там, где живёт сама боль, а не логические размышления о ней.
+    </p>
+    <div class="step-result"><b>Результат:</b> Ты почувствуешь, как отпускает спазм в груди и уходит ком из горла. Мысль "как он мог" перестанет вызывать панику и слёзы прямо во время нашей работы.</div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <p>
+      <span class="step-title">Отключение навязчивых воспоминаний</span>
+      Мы уберём эмоциональный заряд с самого факта предательства и разорвём нейронную связь, которая заставляет твой мозг крутить это больное "кино".
+    </p>
+    <div class="step-result"><b>Результат:</b> Картинки измены потеряют свою власть и превратятся в тусклый, скучный факт из прошлого. Ты уйдёшь с <span class="mark">тотальной тишиной внутри</span> и абсолютно ясной головой, чтобы наконец трезво решить: спасать эти отношения или навсегда их завершить.</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ЦЕНА -->
+<h2 class="section-heading">🫰 Сколько стоит выключить эту боль?</h2>
+
+<p><u>Цена бездействия – это разрушенная нервная система, бессонные ночи и потерянные годы.</u></p>
+<p>Если ты пойдёшь к классическому психологу, стандартный курс – это 2–5 месяцев слёз, бесконечного копания в прошлом и минимум 350–850$ расходов без гарантии, что тебя отпустит.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Обычно моя индивидуальная сессия с глубоким погружением стоит 100$.</p>
+<p><b>Но сегодня я предлагаю провести эту сессию всего за 50$.</b></p>
+
+<div class="price-block">
+  <p class="price-old">Обычная стоимость: 100$</p>
+  <p class="price-main">50$</p>
+  <p class="price-sub">Одна сессия · глубокое погружение</p>
+</div>
+
+<p class="solo"><b>«Что это за 🎠 аттракцион невиданной щедрости? В чём подвох?»</b></p>
+<p>Подвоха нет. Но у меня есть абсолютно эгоистичный, коварный план.</p>
+<p>За одну сессию невозможно перестроить психику, которая копила проблемы десятилетиями. Но можно сработать как 🚑 скорая помощь: остановить этот внутренний ад.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Я хочу дать тебе такое физическое облегчение, чтобы ты на себе прочувствовала: мой метод работает мощно. Я даю реальный результат, а не просто участливо киваю головой.</p>
+<p>И возможно, когда голова станет ясной, ты сама захочешь пойти ко мне в глубокую 2-месячную работу. Чтобы заново отстроить разрушенную самооценку, вернуть личные границы и навсегда удалить программы, из-за которых ты выбираешь ненадёжных мужчин и терпишь боль.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Захочешь – обсудим. Нет – мы просто закроем созвон, и ты уйдёшь со спокойной душой.</p>
+
+<div class="divider"></div>
+
+<p>Но я знаю, как тяжело бывает просто дождаться нашей встречи, когда паника накрывает прямо сейчас.</p>
+<p>Поэтому я не оставлю тебя наедине с этой мясорубкой в голове ни на минуту.</p>
+
+<div class="spacer-sm"></div>
+
+<p><b>🎁 Бонус: аудио-сеанс "Тишина внутри"</b></p>
+<p>Пришлю сразу после оплаты.</p>
+<p>Если снова начнёт душить обида или накроет мысленная жвачка – просто надень наушники. 20 минут, и нервная система расслабится.</p>
+<p>Твоя личная кнопка "выкл", которая всегда под рукой.</p>
+
+<div class="guarantee-block">
+  <div class="guarantee-head">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 2L3 5v5c0 4.418 3.134 8.22 7 9 3.866-.78 7-4.582 7-9V5L10 2z" stroke="#1a9e5c" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M7 10l2 2 4-4" stroke="#1a9e5c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="guarantee-head-title">Гарантия результата</span>
+  </div>
+  <div class="guarantee-body">
+    <p>Если к концу сессии не почувствуешь физического облегчения в теле – я верну тебе <strong>50$. Без лишних вопросов.</strong> Инструмент самопомощи останется у тебя.</p>
+    <div class="g-note">
+      <strong>Важно!</strong> Гарантия работает при условии, что твоя цель действительно получить изменения, а не доказать всему миру, что тебе никто не может помочь. Иначе результата не будет.
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="warning-head">
+  <div class="warning-icon">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M7 2L1.5 11.5h11L7 2z" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M7 6v3" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="7" cy="10.5" r="0.6" fill="#fff"/>
+    </svg>
+  </div>
+  <h2 class="section-heading" style="margin:0">Почему на эту встречу попадут не все</h2>
+</div>
+
+<p>За годы практики я понял одну вещь: я не могу (и не хочу) помогать всем.</p>
+<p>Есть женщины, которые приходят не за решением, а за тем, чтобы их просто послушали, пожалели и подтвердили, какой их муж негодяй.</p>
+<p>Есть те, кто хочет доказать всему миру уникальность своей боли и то, что им уже ничего не поможет.</p>
+
+<div class="spacer-sm"></div>
+
+<p>Мой метод работает быстро и глубоко. Но он требует от тебя <b>реального желания отпустить эту боль</b>, а не носить её в себе годами как орден мученицы.</p>
+<p>Если твоя цель – получить изменения и вернуть себе саму себя, мы сработаемся.</p>
+
+<div class="divider"></div>
+
+<h2 class="section-heading">Как попасть на встречу:</h2>
+
+<div class="steps">
+  <div class="step">
+    <div class="step-num">1</div>
+    <p>Нажми на кнопку ниже "ХОЧУ НА ВСТРЕЧУ". Откроется Telegram-бот.</p>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <p>Ответь на 5 простых вопросов. Это поможет мне понять твою ситуацию.</p>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <p>Если я увижу, что мой метод точно сработает для тебя – я пришлю ссылку на оплату (50$) и мы выберем время.</p>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <p>Если у тебя есть сомнения или вопросы – задай их там же, в переписке. Я отвечу лично. Оплачивать ничего до этого не нужно.</p>
+  </div>
+</div>
+
+<div class="cta-wrap">
+  <a href="https://t.me/truethx2_bot?start=w52476675" class="cta-btn" target="_blank">Хочу на встречу 🖤</a>
+  <p class="cta-hint">Действуй сейчас, пока цена не поднялась, а боль не разрушила тебя окончательно.</p>
+</div>
+
+<div class="disclaimer">
+  <p>Результаты программы могут варьироваться для каждого участника в зависимости от индивидуальных обстоятельств, готовности к изменениям и выполнения всех рекомендаций. Я даю гарантию на результат при условии, что участница выполняет все шаги программы. Если результат не достигнут – возвращаю деньги согласно условиям договора.</p>
+  <p>Важно! Программа не является медицинской услугой и не заменяет психотерапию, психиатрическое лечение или помощь врача. Материалы и сессии носят образовательный и трансформационный характер и направлены на работу с психологическими установками, эмоциональными состояниями и поведенческими паттернами в сферах: тревожности и панических состояний, депрессивных и подавленных состояний, навязчивых мыслей, эмоциональных реакций (обиды, злость, вина, стыд), отношений и любовной зависимости, последствий травматичных событий, самооценки и социальных страхов, близости и сексуальности, а также общего качества жизни. При наличии психических расстройств, требующих медикаментозного лечения, или любых других медицинских показаний – перед участием в программе обязательно проконсультируйтесь с врачом или психиатром. Вы самостоятельно несёте ответственность за ваши решения, действия и результаты.</p>
+  <p>Я не несу ответственности за решения, принятые вами на основании материалов программы, если они не соответствуют её рекомендациям или не связаны с выполнением всех шагов. Зарегистрировавшись в программе, вы соглашаетесь не привлекать меня к ответственности за ваши личные решения и действия.</p>
+  <p>Этот сайт не является частью веб-сайта Facebook или Facebook Inc. Данный сайт никоим образом не поддерживается и не связан с Facebook. FACEBOOK является товарным знаком FACEBOOK, Inc.</p>
+</div>
+
+<footer style="margin-top: 2.4em; padding: 20px 0; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center;">
+  <span style="font-size: 0.72rem; color: var(--ink-3);">Сергей Трушкин · Гипнотерапия · © <span id="year"></span></span>
+  <span style="font-size: 0.72rem; color: var(--ink-3);">Материалы сайта носят информационный характер и не являются медицинской услугой</span>
+</footer>
+
+</div>
+
+<script>
+  const bar = document.getElementById('reading-progress');
+  document.getElementById('year').textContent = new Date().getFullYear();
+  document.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    bar.style.width = progress + '%';
+  });
+</script>
+
+</body>
+</html>
